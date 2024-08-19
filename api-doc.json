@@ -1,7 +1,6 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Test name",
     "version": "1.0.0",
     "description": "A simple Hyper-Express API"
   },
