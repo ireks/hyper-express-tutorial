@@ -4,7 +4,11 @@ import Password from "../../domain/entities/Password";
 export default interface ISSO {
   realmExists(realmName: string): Promise<boolean>;
   createRealm(realmName: string): Promise<void>;
-  createClient(realmName: string, clientId: string, clientSecret: string): Promise<string>;
+  createClient(
+    realmName: string,
+    clientId: string,
+    clientSecret: string
+  ): Promise<string>;
   assignClientRoles(
     realmName: string,
     clientId: string,
@@ -24,7 +28,7 @@ export default interface ISSO {
     password: string,
     realmName: string,
     subdomainClientName: string,
-    subdomainClientSecret:string
+    subdomainClientSecret: string
   ): Promise<string[]>;
 
   setClientSecret(
@@ -32,4 +36,6 @@ export default interface ISSO {
     clientId: string,
     clientSecret: string
   ): Promise<string[]>;
+
+  getCert(realmName: string): Promise<string>;
 }

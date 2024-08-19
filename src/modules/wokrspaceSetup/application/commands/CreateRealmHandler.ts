@@ -3,6 +3,9 @@ import { CreateRealmCommand } from "./Commands";
 import Joi from "joi";
 import ValidationError from "../../../../shared/Errors/ValidationError";
 import ISSO from "../services/ISSO";
+import { writeFileSync } from "fs";
+const CERT_PATH="./files/certs/";
+
 
 const schema = Joi.string()
   .pattern(/^(?=.{1,253}$)((?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,63}$/)
@@ -40,6 +43,17 @@ export class CreateRealmHandler
       this.subdomainClientName,
       this.subdomainClientSecret
     );
+
+    const cert = await this.sso.getCert(realmName);
+
+    try {
+      writeFileSync(CERT_PATH+realmName+".cert", cert);
+      console.log(CERT_PATH+realmName+".cert");
+      
+     
+    } catch (err) {
+      throw new Error("An error occurred while writing to the file:"+ err);
+    }
     await this.sso.assignClientRoles(realmName, clientUuid, roles);
   }
 

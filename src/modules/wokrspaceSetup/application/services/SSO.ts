@@ -93,6 +93,28 @@ export default class SSO {
     }
   }
 
+
+
+  public async getCert(realmName: string): Promise<string>{
+
+    try {
+      const response = await fetch(
+        `${this.keycloakUrl}/realms/${realmName}/protocol/openid-connect/certs`   );
+
+      if (response.status == 404) {
+        throw new Error("Cert doesn't exist.")
+      }
+
+      return await response.text();
+    } catch (error: any) {
+      throw error;
+    }
+  
+  }
+
+
+
+
   public async createRealm(realmName: string): Promise<void> {
     try {
       const token = await this.getAccessToken();
