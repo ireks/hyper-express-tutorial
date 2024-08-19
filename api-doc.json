@@ -10,7 +10,106 @@
       "description": "Local server"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
+    "/realm": {
+      "post": {
+        "summary": "Create a new realm",
+        "tags": [
+          "Realm"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "realmName": {
+                    "type": "string",
+                    "example": "example.domain.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Realm created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Realm created"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/test-secure": {
+      "post": {
+        "summary": "Test secure route",
+        "description": "This endpoint is protected and requires both a valid JWT token in the Authorization header.",
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User has the right to access this route.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "user has right"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access due to missing, invalid, or expired token, or incorrect password.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/login": {
       "post": {
         "summary": "Log in a user",
@@ -86,6 +185,9 @@
       "post": {
         "summary": "Create a new user",
         "description": "Endpoint to create a new user.",
+        "tags": [
+          "User"
+        ],
         "operationId": "createUser",
         "requestBody": {
           "description": "Request payload for creating a new user",
@@ -191,47 +293,7 @@
           }
         }
       }
-    },
-    "/workspace": {
-      "post": {
-        "summary": "Create a new domain",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "domainName": {
-                    "type": "string",
-                    "example": "example.domain.com"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Realm created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Workspace created"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
-  "components": {},
   "tags": []
 }

@@ -2,6 +2,7 @@ import Joi from "joi";
 import ValidationError from "../../../../shared/Errors/ValidationError";
 import Email from "../../domain/entities/Email";
 import Password from "../../domain/entities/Password";
+import ResourceExistsError from "../../../../shared/Errors/ResourceExistsError";
 const schema = Joi.object({
   keycloakUrl: Joi.string().required().messages({
     "any.required": "keycloakUrl is a required field",
@@ -96,6 +97,8 @@ export default class SSO {
     try {
       const token = await this.getAccessToken();
 
+      const realmExists=await this.realmExists(realmName);
+      if(realmExists===true) throw new ResourceExistsError();
       const response = await fetch(`${this.keycloakUrl}/admin/realms`, {
         method: "POST",
         headers: {
@@ -164,7 +167,11 @@ export default class SSO {
     return true;
   }
 
-  async setClientSecret(realm: string, clientId: string, clientSecret: string): Promise<string[]> {
+  async setClientSecret(
+    realm: string,
+    clientId: string,
+    clientSecret: string
+  ): Promise<string[]> {
     const token = await this.getAccessToken();
     const response = await fetch(
       `${this.keycloakUrl}/admin/realms/${realm}/clients/${clientId}/client-secret`,
@@ -199,7 +206,7 @@ export default class SSO {
           body: JSON.stringify({
             clientId,
             enabled: true,
-            publicClient: false,  // False for confidential clients
+            publicClient: false, // False for confidential clients
             directAccessGrantsEnabled: true,
             authorizationServicesEnabled: true,
             serviceAccountsEnabled: true,
@@ -210,7 +217,7 @@ export default class SSO {
             fullScopeAllowed: true,
             surrogateAuthRequired: false,
             clientAuthenticatorType: "client-secret",
-            secret: clientSecret
+            secret: clientSecret,
           }),
         }
       );
@@ -237,7 +244,7 @@ export default class SSO {
     password: string,
     realmName: string,
     subdomainClientName: string,
-    subdomainClientSecret:string
+    subdomainClientSecret: string
   ): Promise<string[]> {
     const keycloakUrl = `${this.keycloakUrl}/realms/${realmName}/protocol/openid-connect/token`;
     console.log(keycloakUrl);

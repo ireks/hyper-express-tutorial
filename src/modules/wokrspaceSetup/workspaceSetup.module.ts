@@ -3,10 +3,10 @@ import CommandBus from "../../shared/CommandBus";
 import QueryBus from "../../shared/QueryBus";
 import {
   CreateUserCommand,
-  CreateWorkspaceCommand,
+  CreateRealmCommand,
   LoginUserCommand,
 } from "./application/commands/Commands";
-import { CreateWorkspaceHandler } from "./application/commands/CreateWorkspaceHandler";
+import { CreateRealmHandler } from "./application/commands/CreateRealmHandler";
 import { CreateUserHandler } from "./application/commands/CreateUserHandler";
 
 import ICommandBus from "../../shared/ICommandBus";
@@ -63,8 +63,8 @@ export default class WorkspaceSetup {
   constructor(readonly commandBus: ICommandBus, readonly queryBus: IQueryBus) {}
   start() {
     this.commandBus.registerHandler(
-      CreateWorkspaceCommand,
-      new CreateWorkspaceHandler(sso,subdomainClientName,subdomainClientSecret)
+      CreateRealmCommand,
+      new CreateRealmHandler(sso,subdomainClientName,subdomainClientSecret)
     );
 
     this.commandBus.registerHandler(

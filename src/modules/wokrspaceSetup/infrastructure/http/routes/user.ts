@@ -5,8 +5,40 @@ import {
   LoginUserCommand,
 } from "../../../application/commands/Commands";
 import ValidationError from "../../../../../shared/Errors/ValidationError";
-
+import authMiddleware from "../../../../../shared/authMiddleware";
 const userRouter = new Router();
+/**
+ * @swagger
+ * /user/test-secure:
+ *   post:
+ *     summary: Test secure route
+ *     description: This endpoint is protected and requires both a valid JWT token in the Authorization header.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: User has the right to access this route.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "user has right"
+ *       401:
+ *         description: Unauthorized access due to missing, invalid, or expired token, or incorrect password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ */
+userRouter.post("/test-secure", authMiddleware, async (req, res) => {
+  res.status(201).json("user has right");
+});
 
 /**
  * @swagger
@@ -91,6 +123,8 @@ userRouter.post("/login", async (req, res) => {
  *    post:
  *      summary: Create a new user
  *      description: Endpoint to create a new user.
+ *      tags:
+ *       - User
  *      operationId: createUser
  *      requestBody:
  *        description: Request payload for creating a new user

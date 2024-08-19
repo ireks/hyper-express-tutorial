@@ -1,11 +1,12 @@
 import { Router } from "hyper-express";
 import logger from "../../../../../shared/logger";
-import { CreateWorkspaceCommand } from "../../../application/commands/Commands";
+import { CreateRealmCommand } from "../../../application/commands/Commands";
 import ValidationError from "../../../../../shared/Errors/ValidationError";
+import ResourceExistsError from "../../../../../shared/Errors/ResourceExistsError";
 
-const workspaceRouter = new Router();
+const realmRouter = new Router();
 
-// workspaceRouter.get("/", async (req, res, next) => {
+// realmRouter.get("/", async (req, res, next) => {
 //   try {
 //     logger.info("GET /users");
 //     res.json({ message: "List of users" });
@@ -14,7 +15,7 @@ const workspaceRouter = new Router();
 //   }
 // });
 
-// workspaceRouter.get("/:id", async (req, res, next) => {
+// realmRouter.get("/:id", async (req, res, next) => {
 //   try {
 //     const userId = req.params.id;
 //     logger.info(`GET /users/${userId}`);
@@ -26,9 +27,11 @@ const workspaceRouter = new Router();
 
 /**
  * @swagger
- * /workspace:
+ * /realm:
  *   post:
- *     summary: Create a new domain
+ *     summary: Create a new realm
+ *     tags:
+ *       - Realm
  *     requestBody:
  *       required: true
  *       content:
@@ -36,7 +39,7 @@ const workspaceRouter = new Router();
  *           schema:
  *             type: object
  *             properties:
- *               domainName:
+ *               realmName:
  *                 type: string
  *                 example: example.domain.com
  *     responses:
@@ -49,30 +52,30 @@ const workspaceRouter = new Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Workspace created
+ *                   example: Realm created
  */
-workspaceRouter.post("/", async (req, res) => {
+realmRouter.post("/", async (req, res) => {
   try {
     const data = await req.json();
 
     const app = req.locals.app;
-    await app
-      .getCommandBus()
-      .execute(new CreateWorkspaceCommand(data.domainName));
-    const message = `Workspace created`;
+    await app.getCommandBus().execute(new CreateRealmCommand(data.realmName));
+    const message = `Realm created`;
     logger.info(message);
     res.status(201).json({ message: message });
   } catch (err: any) {
     logger.error(err.message);
     if (err instanceof ValidationError) {
-      res.status(400).json({ message: "validation Error" });
+      res.status(400).json({ message: "validation Error", errors: err.errors });
+    } else if (err instanceof ResourceExistsError) {
+      res.status(409).json({ message: "Resource exists Error" });
     } else {
-      res.status(400).json({ message: err.message });
+      throw new Error(err.message);
     }
   }
 });
 
-// workspaceRouter.put("/:id", async (req, res, next) => {
+// realmRouter.put("/:id", async (req, res, next) => {
 //   try {
 //     const userId = req.params.id;
 //     const updatedData = await req.json();
@@ -84,7 +87,7 @@ workspaceRouter.post("/", async (req, res) => {
 //   }
 // });
 
-// workspaceRouter.delete("/:id", async (req, res, next) => {
+// realmRouter.delete("/:id", async (req, res, next) => {
 //   try {
 //     const userId = req.params.id;
 //     logger.info(`DELETE /users/${userId}`);
@@ -94,4 +97,4 @@ workspaceRouter.post("/", async (req, res) => {
 //   }
 // });
 
-export default workspaceRouter;
+export default realmRouter;
