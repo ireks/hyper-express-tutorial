@@ -1,5 +1,4 @@
 import HyperExpress from "hyper-express";
-import { jwtDecode } from "jwt-decode";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
@@ -16,7 +15,6 @@ interface Token {
   password: string; // User's password stored in the token
   //
 }
-
 
 interface JWKS {
     keys: Array<{
